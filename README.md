@@ -18,10 +18,11 @@ However, it was also subtly difficult because in order to achieve all of the "ru
 <!-- This is the syntax for commenting/hiding text for readme/markdown -->
 [//]: # (Image References)
 
-[image1]: ./examples/visualization.jpg "Visualization"
-[image2]: ./examples/grayscale.jpg "Grayscaling"
+[image1]: ./examples/DannyBasicVisualization.PNG "Basic Visualization (Plot Random Image and give Shape"
+[image4]: ./examples/dannyswebimages.png "Five Traffic Sign Signs"
+
+[image2]: ./examples/DannyNormalize.PNG "Normalizing from 0->255 pixel range to 0.01->0.99"
 [image3]: ./examples/random_noise.jpg "Random Noise"
-[image4]: ./examples/dannyswebimages.PNG "Five Traffic Sign signs"
 [image5]: ./examples/placeholder.png "Traffic Sign 2"
 [image6]: ./examples/placeholder.png "Traffic Sign 3"
 [image7]: ./examples/placeholder.png "Traffic Sign 4"
@@ -36,41 +37,51 @@ However, it was also subtly difficult because in order to achieve all of the "ru
 
 #### 1. I used built in numpy functions to help summarize aspects of the data set.
 
-* The sizes of training, test, and validation sets were as follows:  34,799; 12,630; 4,410.  These were obtained through applying the `.shape` of the data imported from the files.
-* The shape of a traffic sign image is 32x32 and again this was obtained by using `.shape` with the specific code being:
+* The sizes of training, test, and validation sets were as follows:  **34,799; 12,630; 4,410**.  These were obtained through applying the `.shape` of the data imported from the files.
+* The shape of a traffic sign image is **32x32** and again this was obtained by using `.shape` with the specific code being:
 ```# Determine shape of an traffic sign image
 image_shape1 = (train['features'].shape[1], train['features'].shape[2])
 ```
 
-* The number of unique classes/labels in the data set is 43 and this matches the expected results from looking at the reference .csv file titled signnames.csv.  This was obtained through using `np.unique` and then applying the built in `len()` function.
+* The number of unique classes/labels in the data set is **43** and this matches the expected results from looking at the reference .csv file titled signnames.csv.  This was obtained through using `np.unique` and then applying the built in `len()` function.
 
 #### 2. Include an exploratory visualization of the dataset.
 
-Here is an exploratory visualization of the data set. It is a bar chart showing how the data ...
+Here is a basic exploratory visualization of the data set - It just includes plotting an image chosen from randomly from 1 of 34,799 possible images in the set.  In addition to plotting the image I also display the associated "ground truth" label associated with this image as well as printing out its shape.  This cell can be run several times so that you can sanity check each result to make sure the label matches what you are seeing -- by crossreferencing the file provided.  [*signnames.csv*](https://github.com/dannybynum/DWB-T1-P3/blob/master/signnames.csv)
 
 ![alt text][image1]
 
 ### Design and Test a Model Architecture
 
-#### 1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)
+#### Model Step1: Pre-Processing The Images Before Feeding Them Into The CNN
 
-As a first step, I decided to convert the images to grayscale because ...
+<--!1. Describe how you preprocessed the image data. What techniques were chosen and why did you choose these techniques? Consider including images showing the output of each preprocessing technique. Pre-processing refers to techniques such as converting to grayscale, normalization, etc. (OPTIONAL: As described in the "Stand Out Suggestions" part of the rubric, if you generated additional data for training, describe why you decided to generate additional data, how you generated the data, and provide example images of the additional data. Then describe the characteristics of the augmented training set like number of images in the set, number of images for each class, etc.)-->
 
-Here is an example of a traffic sign image before and after grayscaling.
+I completed two pre-processing steps for all of the datasets.  This pre-processing included (a) Conversion from color to grayscale using the *cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)* function As a first step, and (b) Normalizing the pixel values within each image (moving from possible range of 0->255 to range of 0.01->0.99).
+
+Custom normalization function defined as follows:
+```python
+def normalize_grayscale(image_data):
+    a = 0.01
+    b = 0.99
+    grayscale_min = 0
+    grayscale_max = 255
+    return a + ( ( (image_data)*(b - a) )/( grayscale_max - grayscale_min ) )
+```
+
+Then for each set (train, valid, test) the following was performed (example shown for train set):
+```python
+i=0
+for i in range(n_train):
+    X_train_gray[i] = cv2.cvtColor(X_train[i], cv2.COLOR_RGB2GRAY).reshape(32,32,-1)
+    X_train_gray[i] = normalize_grayscale(X_train_gray[i])
+```
+
+
+After grayscale and normalizing the data the pixel values will be changed to the new "normalized" range.  I am showing this below with a simply print out to the command window before and after applying the normalization function shown above:
 
 ![alt text][image2]
-
-As a last step, I normalized the image data because ...
-
-I decided to generate additional data because ... 
-
-To add more data to the the data set, I used the following techniques because ... 
-
-Here is an example of an original image and an augmented image:
-
-![alt text][image3]
-
-The difference between the original data set and the augmented data set is the following ... 
+The difference between the original data set and the augmented data set is just the grayscale and the normalization - no additional pre-preprocessing was needed to achieve the desired model performance. 
 
 
 #### 2. Describe what your final model architecture looks like including model type, layers, layer sizes, connectivity, etc.) Consider including a diagram and/or table describing the final model.
