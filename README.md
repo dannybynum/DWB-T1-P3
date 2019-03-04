@@ -14,6 +14,21 @@ However, it was also subtly difficult because in order to achieve all of the "ru
 * Use the model to make predictions on new images
 * Analyze the softmax probabilities of the new images
 
+_Basic Setup Steps Before Coding in the Notebook_
+* Fork the notebook from Udacity site
+	* Log into Git and then navigate to the page of interest and click on the fork button.
+	* Navigate to your Git page and click on the Clone/Download button and save it locally
+
+* Activate Environment and Notebook via Anaconda prompt
+
+Basic commands entered are as follows:
+```
+cd ~\Documents\Udacity\Term1>cd DWB-T1-P3
+conda env list
+activate carnd-term1
+Jupyter Notebook
+```
+
 
 <!-- This is the syntax for commenting/hiding text for readme/markdown -->
 [//]: # (Image References)
@@ -59,7 +74,12 @@ Here is a basic exploratory visualization of the data set - It just includes plo
 
 I completed two pre-processing steps for all of the datasets.  This pre-processing included (a) Conversion from color to grayscale using the *cv2.cvtColor(image,cv2.COLOR_RGB2GRAY)* function As a first step, and (b) Normalizing the pixel values within each image (moving from possible range of 0->255 to range of 0.01->0.99).
 
+The normalization step is general practice (listed as required in project instructions) to help with numerical stability -- there is a really good overview of this in the lesson 12: Tensor Flow - Section 25. Normalized Inputs and Initial Weights.
+
+The grayscale is not required but I choose to do this based on the fact that I don't think the color of the sign has a significant impact on being able to recognize what is on the sign - therefore I believe the model should work better with the grayscale applied.  Lesson 14: Convolutional Neural Networks - Section 2. Color --- talks specifically about this concept.
+
 Custom normalization function defined as follows:
+(note that I named this normalize function "normalize_grayscale," but would have worked as-is for 3-channel color image as well)
 ```python
 def normalize_grayscale(image_data):
     a = 0.01
