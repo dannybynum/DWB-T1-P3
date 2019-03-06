@@ -38,10 +38,10 @@ Jupyter Notebook
 
 [image2]: ./examples/DannyNormalize.PNG "Normalizing from 0->255 pixel range to 0.01->0.99"
 [image3]: ./examples/random_noise.jpg "Random Noise"
-[image5]: ./examples/placeholder.png "Traffic Sign 2"
-[image6]: ./examples/placeholder.png "Traffic Sign 3"
-[image7]: ./examples/placeholder.png "Traffic Sign 4"
-[image8]: ./examples/placeholder.png "Traffic Sign 5"
+[image5]: ./examples/ArchCompare.PNG "Project Architecutre Comparison to LeNet Lab in Course"
+[image6]: ./examples/TrainEvalCompare.PNG "Project Training Eval Compared to LeNet Lab in Course"
+[image7]: ./examples/TrainingCompare.PNG "Project Training Code (Running Data Through for # of Ephocs) Compared to LeNet Lab in Course"
+[image8]: ./examples/accuracy.png "Traffic Sign 5"
 
 ## Rubric Points
 ### In this section I will describe how I addressed each rubric point [rubric points](https://review.udacity.com/#!/rubrics/481/view) in my implementation.  
@@ -125,32 +125,48 @@ My final model consisted of the following layers:
 | Fully_Connected_3		| Input = 84, output = 43       				|
 
 The model architecture is very similar to the one used in the course material for the LeNet Lab.  Below is a comparison of the code used for the lab vs that used for the project:
-#######################FIXME########################ADD THIS
+![alt text][image5]
  
 
 
 #### 3. Describe how you trained your model. The discussion can include the type of optimizer, the batch size, number of epochs and any hyperparameters such as learning rate.
+Summary of Training steps (Training Pipeline):
+* Setup "logits" equal to running the CNN (LeNet(x) function) on an input
+* Setup computation of cross-entropy using a built in TensorFlow function
+* Setup a loss operation using a built in TensorFlow function
+* Setup an Optimizer using built in TensorFlow function "AdamOptimizer" and set this to minimize
+* Start a TensorFlow Session and run batches of 128 images through the CNN for each Epoch and run the minimize training opertion previously defined
 
-To train the model, I used an ....
+
+I mostly stuck with the same training approach (Optimizer etc) as was used in the LeNet lab material in the course - below are some comparisons.  The major factors that were changed were the hyperparameters and number of ephocs as follows:
+Ephocs:                   5    -> 50
+learning rate:            0.001-> 0.00068
+sigma (initial weights):  0.1  -> 0.148
+
+
+
+Here is a comparision of my project code with that of the LeNet Lab code in the course for the Training Pipeline and the Training Execution code:
+![alt text][image6]
+
+![alt text][image7]
 
 #### 4. Describe the approach taken for finding a solution and getting the validation set accuracy to be at least 0.93. Include in the discussion the results on the training, validation and test sets and where in the code these were calculated. Your approach may have been an iterative process, in which case, outline the steps you took to get to the final solution and why you chose those steps. Perhaps your solution involved an already well known implementation or architecture. In this case, discuss why you think the architecture is suitable for the current problem.
 
 My final model results were:
-* training set accuracy of ?
-* validation set accuracy of ? 
-* test set accuracy of ?
+* training set accuracy of 100%
+* test set accuracy of 92.4%
+* validation set accuracy of 94.6% 
 
-If an iterative approach was chosen:
-* What was the first architecture that was tried and why was it chosen?
-* What were some problems with the initial architecture?
-* How was the architecture adjusted and why was it adjusted? Typical adjustments could include choosing a different model architecture, adding or taking away layers (pooling, dropout, convolution, etc), using an activation function or changing the activation function. One common justification for adjusting an architecture would be due to overfitting or underfitting. A high accuracy on the training set but low accuracy on the validation set indicates over fitting; a low accuracy on both sets indicates under fitting.
-* Which parameters were tuned? How were they adjusted and why?
-* What are some of the important design choices and why were they chosen? For example, why might a convolution layer work well with this problem? How might a dropout layer help with creating a successful model?
+I used an iterative approach to tweak parameters in order to achieve the required accuracy on the validation set (94.6% achieved, 93% required)
+* The Initial architecture chosen was the LeNet architecture from the lab - I performed grayscale pre-processing on the images because I didn't think color was a significant factor in my being able to recognize the traffic signs so I wanted the model to be indifferent to color.
+* The following graph shows iterative tweaks of the hyperparameters and how this affected accuracy - adjustments were made after noticing a good or bad impact on the accuracy.  These accuracy numbers are on the "test" dataset and the "validation" set was used at the very end with the intention of not wanting the validation results to "bleed in" to the model parameters as was described in the course material.
 
-If a well known architecture was chosen:
-* What architecture was chosen?
-* Why did you believe it would be relevant to the traffic sign application?
-* How does the final model's accuracy on the training, validation and test set provide evidence that the model is working well?
+![alt text][image8]
+
+For the trails the following ranges of parameters were used with adjustments being made for maximimum accuracy
+The Learning Rate was changed in the following range 0.00068 to 0.0007
+The Number of Ephocs was adjusted from 25 to 50
+The Mu (Initial Weights Variance) was adjusted from 0.148 to 0.165
  
 
 ### Test a Model on New Images
@@ -161,41 +177,121 @@ If a well known architecture was chosen:
 Here are five German traffic signs that I found on the web:
 ![alt text][image4]
 
-The first image might be difficult to classify because ...
+Possible Difficulties/Challenges with these images
+* Image 1 doesn't have any challenges - straight on image (no tilt or rotation), and the background is also uniform/solid
+* Images 2 and 5 might present a challenge because part of another sign is included on the same pole with the speed limit sign and they are only partially cropped out
+* Image 3 may present a problem because it is a different representation of a 30kph sign
+* Image 4 may present a little difficulty because the image perspective is not straight on, but I suspect this is also well represented in the training dataset
 
-#### 2. Discuss the model's predictions on these new traffic signs and compare the results to predicting on the test set. At a minimum, discuss what the predictions were, the accuracy on these new predictions, and compare the accuracy to the accuracy on the test set (OPTIONAL: Discuss the results in more detail as described in the "Stand Out Suggestions" part of the rubric).
+
+#### 2. Model's predictions on the new traffic signs (downloaded from web) and discussion of results
 
 Here are the results of the prediction:
 
 | Image			        |     Prediction	        					| 
 |:---------------------:|:---------------------------------------------:| 
-| Stop Sign      		| Stop sign   									| 
-| U-turn     			| U-turn 										|
-| Yield					| Yield											|
-| 100 km/h	      		| Bumpy Road					 				|
-| Slippery Road			| Slippery Road      							|
+| 80 kph	      		| Correct: 80 kph								| 
+| 70 kph     			| Correct: 70 kph								|
+| 30 kph (new type)		| Wrong: Keep Straight							|
+| 30 kph	      		| Wrong: 50 kph					 				|
+| 60 kph				| Correct: 60 kph      							|
 
 
-The model was able to correctly guess 4 of the 5 traffic signs, which gives an accuracy of 80%. This compares favorably to the accuracy on the test set of ...
+The model was able to correctly guess 3 of the 5 traffic signs, which gives an accuracy of 60%. This low accuracy isn't too much of a surprise since there were only 5 images and 1 of them (20%) was a different type of sign that looked "similar" to the typical 30kph sign.  Also as expected the model did give lower probabilities for the images that were classified incorrectly which indicates that it knew it may not be a good classification.
 
-#### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability. (OPTIONAL: as described in the "Stand Out Suggestions" part of the rubric, visualizations can also be provided such as bar charts)
+#### 3. Describe how certain the model is when predicting on each of the five new images by looking at the softmax probabilities for each prediction. Provide the top 5 softmax probabilities for each image along with the sign type of each probability.
 
-The code for making predictions on my final model is located in the 11th cell of the Ipython notebook.
+The code for making predictions on the new images is shown in the following snipets:
 
-For the first image, the model is relatively sure that this is a stop sign (probability of 0.6), and the image does contain a stop sign. The top five soft max probabilities were
+__Image Preparation (need 32x32 and grayscale)__
+```python
+os.chdir('C:/Users/Bynum/Documents/Udacity/Term1/DWB-T1-P3/Signs_From_Web')
+fname1 = 'DBFromWeb1.jpg'
+img1 = cv2.imread(fname1)
+img_res1 = cv2.resize(img_crop1,(32,32),interpolation = cv2.INTER_AREA)
+img_crop1 = img1[85:384,0:299,:]     #Manually crop to a square containing only the sign
+x_1 = cv2.cvtColor(img_res1, cv2.COLOR_BGR2GRAY).reshape(32,32,-1)  #fixme just trying this
+x_1 = normalize_grayscale(x_1)
+x_1 = x_1.astype(np.float32).reshape(-1,32,32,1) #had to convert to float32 due to error message
 
-| Probability         	|     Prediction	        					| 
-|:---------------------:|:---------------------------------------------:| 
-| .60         			| Stop sign   									| 
-| .20     				| U-turn 										|
-| .05					| Yield											|
-| .04	      			| Bumpy Road					 				|
-| .01				    | Slippery Road      							|
+```
+
+__Set up variables__:
+```python
+#Created and initialized with the other TensorFlow placeholders and variables
+web_x = tf.placeholder(tf.float32, (None, 32, 32, 1))
+logits2 = LeNet(web_x)
+```
+
+__Start a TensorFlow Session and feed in the new images and print the predection (cross-refernce to signnames.csv file manually)__
+```python
+with tf.Session() as sess:
+    saver.restore(sess, tf.train.latest_checkpoint('.'))
+ 
+    #using np.argmax here (similar to tf.argmax) Returns the indices of the maximum values along an axis.
+    Output1 = sess.run(logits2,feed_dict={web_x : x_1})
+    Output_1 = np.argmax(Output1,1)
+    print("Output1= ", Output_1)
+```
 
 
-For the second image ... 
+__Start a TensorFlow Session and feed in new images to print the softmax probabilities and associated predictions__
+```python
+Top_5 = tf.nn.top_k(logits2,k=5)
 
-### (Optional) Visualizing the Neural Network (See Step 4 of the Ipython notebook for more details)
-#### 1. Discuss the visual output of your trained network's feature maps. What characteristics did the neural network use to make classifications?
+def softmax(x):
+    """Compute softmax values for each sets of scores in x."""
+    # DWB: Compute and return softmax(x)
+    return np.exp(x)/ np.sum(np.exp(x), axis=1) #changed axis to 1 here
+
+with tf.Session() as sess:
+    saver.restore(sess, tf.train.latest_checkpoint('.'))
+    
+    #will still have to use the ".values" at the end to get an array with the actual values that can feed into softmax function
+    Top_5_1 = sess.run(Top_5,feed_dict={web_x : x_1})
+
+    print("Web_Image1:", "Ground Truth Label is: ", Web_Image_Labels[0])
+    print("Top Model Prediction Labels:  ")
+    print(Top_5_1.indices)
+    #print("Associated Softmax Probabilities For These Predictions: ", np.around(softmax(Top_5_1.values), decimals=2))
+    print("Associated Softmax Probabilities For These Predictions: ") 
+    print(softmax(Top_5_1.values))
+    print("\r")
+
+```
+
+For the five images downloaed from the web the top 5 model predictions and associated softmax probabilities is shown:
+
+__Web_Image1: Ground Truth Label is:  5 (sign: 80kph)__
+_Top Model Prediction Labels:_  
+[[5 2 3 1 7]]
+_Associated Softmax Probabilities For These Predictions:_ 
+[[  9.90571260e-01   8.22467171e-03   6.60758466e-04   5.41050918e-04
+    2.27484293e-06]]
+
+__Web_Image1: Ground Truth Label is:  4  (sign: 70kph)__
+_Top Model Prediction Labels:_  
+[[4 2 1 0 5]]
+_Associated Softmax Probabilities For These Predictions:_ 
+[[  9.39993560e-01   4.07896936e-02   1.90166067e-02   1.98047797e-04
+    2.13774911e-06]]
+
+__Web_Image1: Ground Truth Label is:  1 (sign: 30kph)__
+_Top Model Prediction Labels:_  
+[[38 36 25 40 12]]
+_Associated Softmax Probabilities For These Predictions:_ 
+[[ 0.7860496   0.14425866  0.03702407  0.01951063  0.01315706]]
+
+__Web_Image1: Ground Truth Label is:  1  (sign: 30kph)__
+_Top Model Prediction Labels:_  
+[[ 2 31 40  1  5]]
+_Associated Softmax Probabilities For These Predictions:_ 
+[[ 0.80455142  0.10518255  0.05427733  0.0247219   0.01126684]]
+
+__Web_Image1: Ground Truth Label is:  3  (sign: 60kph)__
+_Top Model Prediction Labels:_  
+[[ 3  1  7  2 11]]
+_Associated Softmax Probabilities For These Predictions:_ 
+[[ 0.93508416  0.02525585  0.0232052   0.0087737   0.00768103]]
 
 
